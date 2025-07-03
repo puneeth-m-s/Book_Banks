@@ -7,6 +7,9 @@ import Home from "./pages/Home";
 import { FaBook } from "react-icons/fa";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Cart from "./pages/Cart";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
+
 
 function App() {
   const { isAuthenticated, logout } = useContext(AuthContext);
@@ -30,6 +33,7 @@ function App() {
         </div>
         <div className="nav-links">
           <Link to="/">Home</Link>
+          <Link to="/cart">Cart</Link>
           {!isAuthenticated && <Link to="/login">Login</Link>}
           {!isAuthenticated && <Link to="/register">Register</Link>}
           {isAuthenticated && (
@@ -54,6 +58,9 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout-success" element={<CheckoutSuccess />} />
+
       </Routes>
     </BrowserRouter>
   );
