@@ -1,9 +1,12 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom"; // add this for redirect
 
 const Login = () => {
-  const { login } = useContext(AuthContext); // <== get the login function
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate(); // to redirect after login
+
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -17,8 +20,11 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", formData);
-      login(res.data.token); // <== save the token using context
+      // ✅ Save both token and user
+      login(res.data.token, res.data.user);
+
       alert("Login successful!");
+      navigate("/"); // redirect to home
     } catch (err) {
       console.error(err);
       alert("Login failed.");

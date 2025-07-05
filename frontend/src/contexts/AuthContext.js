@@ -1,36 +1,42 @@
 import React, { createContext, useState, useEffect } from "react";
 
-// Create the context object
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // State to store token
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [user, setUser] = useState(null);
 
-  // On component mount, check localStorage
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser && storedUser !== "undefined" && storedUser !== "") {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error("Error parsing user from localStorage:", err);
+        setUser(null);
+      }
     }
   }, []);
 
-  // Helper to log in (save token)
-  const login = (newToken) => {
+  const login = (newToken, userData) => {
     localStorage.setItem("token", newToken);
+    localStorage.setItem("user", JSON.stringify(userData));
     setToken(newToken);
+    setUser(userData);
   };
 
-  // Helper to log out (remove token)
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setToken(null);
+    setUser(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
         token,
+        user,
         isAuthenticated: !!token,
         login,
         logout,

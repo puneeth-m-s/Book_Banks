@@ -9,10 +9,14 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
-
+import MyOrders from "./pages/MyOrders";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from "./pages/Profile";
+import AdminPanel from "./pages/AdminPanel";
 
 function App() {
-  const { isAuthenticated, logout } = useContext(AuthContext);
+  const { isAuthenticated, logout, user } = useContext(AuthContext);
+  console.log("AuthContext user value:", user);
 
   return (
     <BrowserRouter>
@@ -34,8 +38,17 @@ function App() {
         <div className="nav-links">
           <Link to="/">Home</Link>
           <Link to="/cart">Cart</Link>
+          <Link to="/my-orders">My Orders</Link>
+          <Link to="/profile">Profile</Link>
+
+          {/* Admin Panel Link */}
+          {user?.role === "admin" && (
+            <Link to="/admin">Admin Panel</Link>
+          )}
+
           {!isAuthenticated && <Link to="/login">Login</Link>}
           {!isAuthenticated && <Link to="/register">Register</Link>}
+
           {isAuthenticated && (
             <button
               onClick={logout}
@@ -58,14 +71,54 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout-success" element={<CheckoutSuccess />} />
 
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/checkout-success"
+          element={
+            <ProtectedRoute>
+              <CheckoutSuccess />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/my-orders"
+          element={
+            <ProtectedRoute>
+              <MyOrders />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminPanel />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
 }
 
-// ✅ THIS IS THE MISSING LINE
 export default App;
-

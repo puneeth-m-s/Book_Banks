@@ -7,33 +7,57 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (book) => {
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.book._id === book._id);
+      const existingItem = prevItems.find((item) => item._id === book._id);
       if (existingItem) {
         return prevItems.map((item) =>
-          item.book._id === book._id
+          item._id === book._id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       } else {
-        return [...prevItems, { book, quantity: 1 }];
+        return [
+          ...prevItems,
+          {
+            _id: book._id,
+            title: book.title,
+            price: book.price,
+            quantity: 1,
+          },
+        ];
       }
     });
   };
 
   const removeFromCart = (bookId) => {
     setCartItems((prevItems) =>
-      prevItems
-        .map((item) =>
-          item.book._id === bookId
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
+      prevItems.filter((item) => item._id !== bookId)
     );
   };
 
   const clearCart = () => {
     setCartItems([]);
+  };
+
+  const increaseQuantity = (bookId) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item._id === bookId
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      )
+    );
+  };
+
+  const decreaseQuantity = (bookId) => {
+    setCartItems((prevItems) =>
+      prevItems
+        .map((item) =>
+          item._id === bookId
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
   };
 
   return (
@@ -43,6 +67,8 @@ export const CartProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         clearCart,
+        increaseQuantity,
+        decreaseQuantity,
       }}
     >
       {children}
