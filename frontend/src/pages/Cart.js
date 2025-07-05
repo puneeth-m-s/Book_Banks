@@ -1,27 +1,22 @@
 import React, { useContext } from "react";
 import { CartContext } from "../contexts/CartContext";
-
-
+import { AuthContext } from "../contexts/AuthContext";
+import axios from "axios";
 
 const Cart = () => {
   const { cartItems, removeFromCart, clearCart } = useContext(CartContext);
+  const { user } = useContext(AuthContext);
 
   const totalPrice = cartItems.reduce(
     (sum, item) => sum + item.book.price * item.quantity,
     0
   );
 
-  const priceFormatter = new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 2,
-  });
-
   return (
-    <div className="container">
-      <h2>Your Cart</h2>
+    <div style={{ maxWidth: "800px", margin: "2rem auto", padding: "1rem" }}>
+      <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>Your Cart</h2>
       {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <p style={{ textAlign: "center" }}>Your cart is empty.</p>
       ) : (
         <>
           <ul style={{ listStyle: "none", padding: 0 }}>
@@ -29,18 +24,17 @@ const Cart = () => {
               <li
                 key={item.book._id}
                 style={{
-                  border: "1px solid #ccc",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
                   padding: "1rem",
                   marginBottom: "1rem",
-                  borderRadius: "4px",
                 }}
               >
                 <h3>{item.book.title}</h3>
                 <p>Quantity: {item.quantity}</p>
-                <p>Price: {priceFormatter.format(item.book.price)}</p>
+                <p>Price: ₹{item.book.price}</p>
                 <p>
-                  Subtotal:{" "}
-                  {priceFormatter.format(item.book.price * item.quantity)}
+                  Subtotal: ₹{(item.book.price * item.quantity).toFixed(2)}
                 </p>
                 <button
                   onClick={() => removeFromCart(item.book._id)}
@@ -59,40 +53,76 @@ const Cart = () => {
               </li>
             ))}
           </ul>
-          <h3>Total: {priceFormatter.format(totalPrice)}</h3>
-          <button
-            onClick={() => {
-                clearCart();
-                window.location.href = "/checkout-success";
-            }}
+          <div
             style={{
+              textAlign: "right",
+              fontWeight: "bold",
+              fontSize: "1.2rem",
+              marginTop: "1rem",
+            }}
+          >
+            Total: ₹{totalPrice.toFixed(2)}
+          </div>
+          <div style={{ textAlign: "right", marginTop: "1rem" }}>
+            <button
+              onClick={clearCart}
+              style={{
+                padding: "0.5rem",
+                backgroundColor: "#6c757d",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                marginRight: "0.5rem",
+              }}
+            >
+              Clear Cart
+            </button>
+            <button
+              style={{
                 padding: "0.5rem",
                 backgroundColor: "#28a745",
                 color: "#fff",
                 border: "none",
                 borderRadius: "4px",
                 cursor: "pointer",
-                marginTop: "1rem",
-                marginLeft: "1rem",
-            }}
-            >
-                Checkout
-            </button>
+              }}
+              onClick={async () => {
+                if (!user || !user.token) {
+                  alert("You must be logged in to checkout.");
+                  return;
+                }
 
-          <button
-            onClick={clearCart}
-            style={{
-              padding: "0.5rem",
-              backgroundColor: "#6c757d",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              marginTop: "1rem",
-            }}
-          >
-            Clear Cart
-          </button>
+                try {
+                  await axios.post(
+                    "http://localhost:5000/api/orders",
+                    {
+                      items: cartItems.map((item) => ({
+                        bookId: item.book._id,
+                        title: item.book.title,
+                        price: item.book.price,
+                        quantity: item.quantity,
+                      })),
+                      total: totalPrice,
+                    },
+                    {
+                      headers: {
+                        Authorization: `Bearer ${user.token}`,
+                      },
+                    }
+                  );
+
+                  clearCart();
+                  window.location.href = "/checkout-success";
+                } catch (err) {
+                  console.error(err);
+                  alert("Error placing order.");
+                }
+              }}
+            >
+              Checkout
+            </button>
+          </div>
         </>
       )}
     </div>
