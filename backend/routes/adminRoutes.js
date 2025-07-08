@@ -1,19 +1,32 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User");
+const Book = require("../models/Book");
 const Order = require("../models/Order");
-const verifyToken = require("../middleware/auth");
-const isAdmin = require("../middleware/admin");
+const adminOnly = require("../middleware/admin");
 
-// Get all users
-router.get("/users", verifyToken, isAdmin, async (req, res) => {
-  const users = await User.find().select("-password");
-  res.json(users);
+// Get all books
+router.get("/books", adminOnly, async (req, res) => {
+  const books = await Book.find();
+  res.json(books);
+});
+
+// Add a new book
+router.post("/books", adminOnly, async (req, res) => {
+  const { title, author, price } = req.body;
+  const newBook = new Book({ title, author, price });
+  await newBook.save();
+  res.json(newBook);
+});
+
+// Delete a book
+router.delete("/books/:id", adminOnly, async (req, res) => {
+  await Book.findByIdAndDelete(req.params.id);
+  res.json({ message: "Book deleted" });
 });
 
 // Get all orders
-router.get("/orders", verifyToken, isAdmin, async (req, res) => {
-  const orders = await Order.find().sort({ createdAt: -1 });
+router.get("/orders", adminOnly, async (req, res) => {
+  const orders = await Order.find().populate("items.bookId");
   res.json(orders);
 });
 
