@@ -42,9 +42,10 @@ function App() {
           <Link to="/profile">Profile</Link>
 
           {/* Admin Panel Link */}
-          {user?.role === "admin" && (
-            <Link to="/admin">Admin Panel</Link>
-          )}
+          {isAuthenticated && user?.role === "admin" && (
+            <Link to="/admin">Admin</Link>
+        )}
+
 
           {!isAuthenticated && <Link to="/login">Login</Link>}
           {!isAuthenticated && <Link to="/register">Register</Link>}
