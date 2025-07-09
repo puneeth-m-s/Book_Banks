@@ -2,38 +2,39 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const verifyToken = require("../middleware/auth");
-const bcrypt = require("bcrypt");
+const multer = require("multer");
+const path = require("path");
 
-// Get current user info
-router.get("/me", verifyToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select("-password");
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch user info" });
+// Configure Multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    // Unique file name: userId + timestamp + ext
+    const ext = path.extname(file.originalname);
+    cb(null, `${req.user.id}_${Date.now()}${ext}`);
   }
 });
 
-// Update user info
-router.put("/me", verifyToken, async (req, res) => {
-  try {
-    const { name, password } = req.body;
+const upload = multer({ storage });
 
-    const update = {};
-    if (name) update.name = name;
-    if (password) {
-      const hashed = await bcrypt.hash(password, 10);
-      update.password = hashed;
+// POST /api/users/me/avatar
+router.post(
+  "/me/avatar",
+  verifyToken,
+  upload.single("avatar"),
+  async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded." });
     }
 
-    const user = await User.findByIdAndUpdate(req.user.id, update, {
-      new: true,
-    }).select("-password");
+    const avatarUrl = `/uploads/${req.file.filename}`;
 
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to update user info" });
+    await User.findByIdAndUpdate(req.user.id, { avatar: avatarUrl });
+
+    res.json({ message: "Avatar uploaded successfully.", avatar: avatarUrl });
   }
-});
+);
 
 module.exports = router;
