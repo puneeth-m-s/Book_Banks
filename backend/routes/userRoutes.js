@@ -11,7 +11,6 @@ const storage = multer.diskStorage({
     cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    // Unique file name: userId + timestamp + ext
     const ext = path.extname(file.originalname);
     cb(null, `${req.user.id}_${Date.now()}${ext}`);
   }
@@ -19,7 +18,21 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// POST /api/users/me/avatar
+// ✅ GET /api/users/me - Get current user profile
+router.get("/me", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error("Error fetching user profile:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ✅ POST /api/users/me/avatar - Upload avatar
 router.post(
   "/me/avatar",
   verifyToken,
