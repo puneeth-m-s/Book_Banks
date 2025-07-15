@@ -1,8 +1,10 @@
-import './App.css';
-import React from "react";
+import "./App.css";
+import React, { useContext } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import { useContext } from "react";
 import { AuthContext } from "./contexts/AuthContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Home from "./pages/Home";
 import { FaBook } from "react-icons/fa";
 import Login from "./pages/Login";
@@ -16,6 +18,7 @@ import AdminPanel from "./pages/AdminPanel";
 
 function App() {
   const { isAuthenticated, logout, user } = useContext(AuthContext);
+
   console.log("AuthContext user value:", user);
 
   return (
@@ -28,51 +31,81 @@ function App() {
               color: "#fff",
               textDecoration: "none",
               display: "flex",
-              alignItems: "center"
+              alignItems: "center",
             }}
           >
             <FaBook size={24} style={{ marginRight: "0.5rem" }} />
             <span>Book Bank</span>
           </Link>
         </div>
-        <div className="nav-links">
+
+        <div
+          className="nav-links"
+          style={{ display: "flex", alignItems: "center" }}
+        >
           <Link to="/">Home</Link>
           <Link to="/cart">Cart</Link>
           <Link to="/my-orders">My Orders</Link>
           <Link to="/profile">Profile</Link>
 
-          {/* Admin Panel Link */}
           {isAuthenticated && user?.role === "admin" && (
             <Link to="/admin">Admin</Link>
-        )}
-
+          )}
 
           {!isAuthenticated && <Link to="/login">Login</Link>}
           {!isAuthenticated && <Link to="/register">Register</Link>}
 
           {isAuthenticated && (
-            <button
-              onClick={logout}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "#fff",
-                cursor: "pointer",
-                fontWeight: "bold",
-                marginLeft: "1rem"
-              }}
-            >
-              Logout
-            </button>
+            <>
+              {/* Show avatar if available */}
+              {user?.avatar ? (
+                <img
+                  src={`http://localhost:5000${user.avatar}`}
+                  alt="avatar"
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    marginLeft: "1rem",
+                  }}
+                />
+              ) : (
+                <span
+                  style={{
+                    marginLeft: "1rem",
+                    color: "#fff",
+                    fontSize: "0.9rem",
+                  }}
+                >
+                  No Avatar
+                </span>
+              )}
+
+              <button
+                onClick={logout}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#fff",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  marginLeft: "1rem",
+                }}
+              >
+                Logout
+              </button>
+            </>
           )}
         </div>
       </nav>
+
+      <ToastContainer position="top-right" autoClose={3000} />
 
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
         <Route
           path="/cart"
           element={
@@ -81,7 +114,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/checkout-success"
           element={
@@ -90,7 +122,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/my-orders"
           element={
@@ -99,7 +130,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/profile"
           element={
@@ -108,7 +138,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/admin"
           element={

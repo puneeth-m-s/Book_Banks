@@ -1,35 +1,53 @@
+// contexts/AuthContext.js
 import React, { createContext, useState, useEffect } from "react";
+import axios from "axios";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!token);
 
+  // Fetch the user on initial load
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser && storedUser !== "undefined" && storedUser !== "") {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.error("Error parsing user from localStorage:", err);
-        setUser(null);
-      }
+    if (token) {
+      fetchUser();
     }
-  }, []);
+  }, [token]);
 
-  const login = (newToken, userData) => {
-    localStorage.setItem("token", newToken);
-    localStorage.setItem("user", JSON.stringify(userData));
-    setToken(newToken);
-    setUser(userData);
+  const fetchUser = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/users/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(res.data);
+    } catch (err) {
+      console.error("Failed to fetch user", err);
+      setUser(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem("token");
+      setToken(null);
+    }
+  };
+
+  // This function can be called after uploading avatar
+  const refreshUser = async () => {
+    await fetchUser();
+  };
+
+  const login = (token) => {
+    localStorage.setItem("token", token);
+    setToken(token);
+    setIsAuthenticated(true);
+    fetchUser();
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
     setToken(null);
     setUser(null);
+    setIsAuthenticated(false);
   };
 
   return (
@@ -37,9 +55,10 @@ export const AuthProvider = ({ children }) => {
       value={{
         token,
         user,
-        isAuthenticated: !!token,
+        isAuthenticated,
         login,
         logout,
+        refreshUser, // Expose this in context
       }}
     >
       {children}
