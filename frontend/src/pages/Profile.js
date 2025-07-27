@@ -74,24 +74,49 @@ const Profile = () => {
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div style={{ maxWidth: "500px", margin: "2rem auto" }}>
+    <div style={{ maxWidth: "500px", margin: "2rem auto", textAlign: "center" }}>
+      {/* ✅ Show Avatar at Top */}
+      {user.avatar && (
+        <img
+          src={`http://localhost:5000${user.avatar}`}
+          alt="Avatar"
+          style={{
+            width: "120px",
+            height: "120px",
+            borderRadius: "50%",
+            objectFit: "cover",
+            marginBottom: "1rem",
+            border: "2px solid #ccc",
+          }}
+        />
+      )}
+
       <h2>Profile</h2>
       {success && <p style={{ color: "green" }}>Profile updated successfully</p>}
-      <form onSubmit={handleUpdate}>
-        <div>
+      <form onSubmit={handleUpdate} style={{ textAlign: "left" }}>
+        <div style={{ marginBottom: "1rem" }}>
           <label>Name:</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={{ width: "100%" }}
+          />
         </div>
-        <div>
+        <div style={{ marginBottom: "1rem" }}>
           <label>Email:</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ width: "100%" }}
+          />
         </div>
-        <div>
+        <div style={{ marginBottom: "1rem" }}>
           <label>New Password:</label>
           <input
             value={password}
             type="password"
             onChange={(e) => setPassword(e.target.value)}
+            style={{ width: "100%" }}
           />
         </div>
         <button type="submit" style={{ marginTop: "1rem" }}>
@@ -99,24 +124,17 @@ const Profile = () => {
         </button>
       </form>
 
-      {/* Avatar Upload */}
+      {/* ✅ Avatar Upload Section */}
       <div style={{ marginTop: "2rem" }}>
-        <h3>Avatar</h3>
-        {user.avatar && (
-          <img
-            src={`http://localhost:5000${user.avatar}`}
-            alt="Avatar"
-            style={{ width: "100px", borderRadius: "50%", marginBottom: "1rem" }}
-          />
-        )}
-        <div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setAvatarFile(e.target.files[0])}
-          />
-          <button onClick={handleAvatarUpload}>Upload Avatar</button>
-        </div>
+        <h3>Change Avatar</h3>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setAvatarFile(e.target.files[0])}
+        />
+        <button onClick={handleAvatarUpload} style={{ marginTop: "0.5rem" }}>
+          Upload Avatar
+        </button>
       </div>
     </div>
   );

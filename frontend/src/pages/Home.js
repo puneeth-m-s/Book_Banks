@@ -26,7 +26,7 @@ const Home = () => {
         className="book-list"
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(100px, 280px))",
           gap: "1rem"
         }}
       >
@@ -37,14 +37,21 @@ const Home = () => {
             style={{
               border: "1px solid #ccc",
               padding: "1rem",
-              borderRadius: "4px"
+              borderRadius: "4px",
+              textAlign: "center"
             }}
           >
             {book.image && (
               <img
                 src={book.image}
                 alt={book.title}
-                style={{ width: "100%", height: "auto" }}
+                style={{
+                  width: "200px",
+                  height: "300px",
+                  objectFit: "cover",
+                  borderRadius: "4px",
+                  marginBottom: "0.5rem"
+                }}
               />
             )}
             <h3>{book.title}</h3>
