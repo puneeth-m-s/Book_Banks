@@ -8,6 +8,7 @@ const AdminPanel = () => {
   const [orders, setOrders] = useState([]);
   const [newBook, setNewBook] = useState({ title: "", author: "", price: "" });
 
+<<<<<<< HEAD
   // Load books and orders on mount
   useEffect(() => {
     fetchBooks();
@@ -37,6 +38,38 @@ const AdminPanel = () => {
       alert("Failed to fetch orders.");
     }
   };
+=======
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/admin/books", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setBooks(res.data);
+      } catch (err) {
+        console.error("Error fetching books:", err);
+        alert("Failed to fetch books.");
+      }
+    };
+
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/admin/orders", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setOrders(res.data);
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+        alert("Failed to fetch orders.");
+      }
+    };
+
+    // Call them here
+    fetchBooks();
+    fetchOrders();
+}, [token]); // Only re-run if token changes
+
+>>>>>>> 1ab492634fd05fa351c1a29dad0f72afb59b8b1b
 
   const handleAddBook = async () => {
     try {

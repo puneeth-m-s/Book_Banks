@@ -26,7 +26,11 @@ const Home = () => {
         className="book-list"
         style={{
           display: "grid",
+<<<<<<< HEAD
           gridTemplateColumns: "repeat(auto-fit, minmax(100px, 280px))",
+=======
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+>>>>>>> 1ab492634fd05fa351c1a29dad0f72afb59b8b1b
           gap: "1rem"
         }}
       >
@@ -37,14 +41,19 @@ const Home = () => {
             style={{
               border: "1px solid #ccc",
               padding: "1rem",
+<<<<<<< HEAD
               borderRadius: "4px",
               textAlign: "center"
+=======
+              borderRadius: "4px"
+>>>>>>> 1ab492634fd05fa351c1a29dad0f72afb59b8b1b
             }}
           >
             {book.image && (
               <img
                 src={book.image}
                 alt={book.title}
+<<<<<<< HEAD
                 style={{
                   width: "200px",
                   height: "300px",
@@ -52,6 +61,9 @@ const Home = () => {
                   borderRadius: "4px",
                   marginBottom: "0.5rem"
                 }}
+=======
+                style={{ width: "100%", height: "auto" }}
+>>>>>>> 1ab492634fd05fa351c1a29dad0f72afb59b8b1b
               />
             )}
             <h3>{book.title}</h3>
